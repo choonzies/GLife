@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1086056501556",
+    "project_id": "glife-27a06",
+    "storage_bucket": "glife-27a06.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086056501556:android:354662af64b0bbe3df1561",
+        "android_client_info": {
+          "package_name": "com.example.glife"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlbuDbdntoUDO5wlG-7cBjvWnH3LAPFn0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
