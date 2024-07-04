@@ -10,16 +10,19 @@ class Friends extends StatefulWidget {
 
 class _FriendsState extends State<Friends> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  String username = 'qwerty';
   
   List<dynamic> friends = [];
   List<dynamic> filteredFriends = [];
+  List<dynamic> friendReqs = [];
 
-  Future<void> fetchUserData() async {
+  Future<void> fetchFriends() async {
     try {
-      DocumentSnapshot userDoc = await _firestore.collection('users').doc('qwerty').get();
-      if (userDoc != null && userDoc!.exists) {
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(username).get();
+      if (userDoc.exists) {
         setState(() {
-          friends = userDoc!.get('friends') ?? [];
+          friends = userDoc.get('friends') ?? [];
           filteredFriends.addAll(friends);
         });
       } else {
@@ -30,13 +33,48 @@ class _FriendsState extends State<Friends> {
     }
   }
 
-  
+  Future<void> fetchFriendReqs() async {
+    try {
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(username).get();
+      if (userDoc.exists) {
+        setState(() {
+          friendReqs = userDoc.get('friendReqs') ?? [];
+        });
+      } else {
+        print('Document does not exist');
+      }
+    } catch (e) {
+      print('Error retrieving document: $e');
+    }
+  }
+
+  Future<void> deleteFieldListItem(String collection, String document, String field, String item) async {
+    try {
+      await _firestore.collection(collection).doc(username).update({
+        field: FieldValue.arrayRemove([item]),
+      });
+      print('Item removed from ListField successfully');
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> addFieldListItem(String collection, String document, String field, String item) async {
+    try {
+      await _firestore.collection(collection).doc(document).update({
+        field: FieldValue.arrayUnion([item]),
+      });
+      print('Item added to ListField successfully');
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    fetchUserData();
-    //filteredFriends.addAll(friends);
+    fetchFriends();
+    fetchFriendReqs();
   }
 
   void filterFriends(String query) {
@@ -64,8 +102,8 @@ class _FriendsState extends State<Friends> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Add Friend'),
-          content: SingleChildScrollView(
+          title: const Text('Add Friend'),
+          content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 // Text('Enter Friend username'),
@@ -81,7 +119,7 @@ class _FriendsState extends State<Friends> {
             TextButton(
               child: Text('Add'),
               onPressed: () async {
-                DocumentSnapshot userDoc = await _firestore.collection('users').doc('qwerty').get();
+                DocumentSnapshot userDoc = await _firestore.collection('users').doc(username).get();
                 print(userDoc.get('friends'));
                 // Perform add friend action
                 Navigator.of(context).pop(); // Close the dialog
@@ -91,6 +129,85 @@ class _FriendsState extends State<Friends> {
               child: Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }  
+
+  void _showFriendRequestsDialog() {
+    final scaffold = ScaffoldMessenger.of(context);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Friend Requests'),
+          content: Container(
+            width: double.minPositive,
+            height: 300.0,
+            child: ListView.builder(
+              itemCount: friendReqs.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(friendReqs[index]),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.check),
+                        onPressed: () {
+                          // Firebase stuff - delete from friendReqs, add to Friends
+                          addFieldListItem('users', username, 'friends', friendReqs[index]);
+                          deleteFieldListItem('users', username, 'friendReqs', friendReqs[index]);
+                          
+                          // Handle accept friend request
+                          scaffold.showSnackBar(
+                            SnackBar(
+                              content: Text('Added ${friendReqs[index]} as friend'),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                          setState(() {
+                            friends.add(friendReqs[index]);
+                            friendReqs.remove(friendReqs[index]);
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          // Firebase stuff
+                          deleteFieldListItem('users', username, 'friendReqs', friendReqs[index]);
+
+                          // Handle reject friend request
+                          scaffold.showSnackBar(
+                            SnackBar(
+                              content: Text('Rejected ${friendReqs[index]}'),
+                              duration: Duration(seconds: 1),
+                            ),
+                          );
+                          setState(() {
+                            friendReqs.remove(friendReqs[index]);
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  onTap: () {
+                    // View user profile
+                    print('Tapped on ${friendReqs[index]}');
+                  },
+                );
+              },
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -123,14 +240,6 @@ class _FriendsState extends State<Friends> {
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text(filteredFriends[index]),
-                  onTap: () {
-                    // Handle friend selection
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Added ${filteredFriends[index]} as friend.'),
-                      ),
-                    );
-                  },
                 );
               },
             ),
@@ -140,8 +249,8 @@ class _FriendsState extends State<Friends> {
       floatingActionButton: Stack(
         children: [
           Positioned(
-            bottom: 16.0, // Adjust as needed
-            right: 16.0, // Adjust as needed
+            bottom: 16.0,
+            right: 16.0,
             child: GestureDetector(
               onTap: () {
                 // Perform action when the button is tapped
@@ -166,7 +275,40 @@ class _FriendsState extends State<Friends> {
                       ),
                     ),
                     SizedBox(width: 8.0),
-                    Icon(Icons.add, color: Colors.white),
+                    Icon(Icons.add_reaction, color: Colors.white),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 80.0,
+            right: 16.0,
+            child: GestureDetector(
+              onTap: () {
+                // Perform action when the button is tapped
+                _showFriendRequestsDialog();
+              },
+              child: Container(
+                width: 120,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.green,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Requests',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 8.0),
+                    Icon(Icons.quiz_rounded, color: Colors.white),
                   ],
                 ),
               ),
