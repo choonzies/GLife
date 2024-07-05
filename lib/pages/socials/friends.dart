@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Friends extends StatefulWidget {
@@ -17,8 +18,35 @@ class _FriendsState extends State<Friends> {
   List<dynamic> filteredFriends = [];
   List<dynamic> friendReqs = [];
 
-  String _getUsername() {
-    return 'qwerty';
+  Future<void> _getUsername() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      String email = user.email!;
+      String temp = await getUsernameFromEmail(email) ?? 'Username not found';
+      username = temp;
+    } else {
+      print('No user signed in');
+    }
+  }
+
+  Future<String?> getUsernameFromEmail(String email) async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // Assuming there's only one document per email, return the first username found
+        return querySnapshot.docs.first.id;
+      } else {
+        // Handle case where no document with the given email is found
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching username: $e');
+      return null;
+    }
   }
 
   Future<void> fetchFriends() async {
@@ -76,8 +104,12 @@ class _FriendsState extends State<Friends> {
 
   @override
   void initState() {
-    username = _getUsername();
     super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    await _getUsername();
     fetchFriends();
     fetchFriendReqs();
   }
@@ -216,6 +248,7 @@ void showAddFriendDialog(BuildContext context) {
                             onPressed: () async {
                               // Firebase stuff - delete from friendReqs, add to Friends
                               await addFieldListItem('users', username, 'friends', friendReqs[index]);
+                              await addFieldListItem('users', friendReqs[index], 'friends', username);
                               await deleteFieldListItem('users', username, 'friendReqs', friendReqs[index]);
                               
                               // Handle accept friend request
