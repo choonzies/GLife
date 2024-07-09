@@ -265,7 +265,10 @@ class _GroupsState extends State<Groups> {
           ],
         );
       },
-    );
+    ).then((_) {
+        // After dialog is closed, trigger a rebuild of the groups list
+        setState(() {});
+      });
   }
 
   void _createGroup(String groupName) async {
@@ -278,6 +281,9 @@ class _GroupsState extends State<Groups> {
         'members': [],
       });
     await addFieldListItem('users', username, 'groups', groupName); // Add group to leader's list
+    setState(() {
+      groups.add(groupName);
+    });
   }
   
   void _showGroupRequestsDialog() {
@@ -391,7 +397,7 @@ class _GroupsState extends State<Groups> {
             child: TextField(
               onChanged: (value) => _filterGroups(value),
               decoration: InputDecoration(
-                hintText: 'Search Friends',
+                hintText: 'Search Groups',
                 prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
