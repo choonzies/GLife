@@ -312,7 +312,7 @@ class _GroupsState extends State<Groups> {
                               // Firebase stuff - delete from groupReqs, add to groups
                               await addFieldListItem('users', username, 'groups', groupReqs[index]);
                               await deleteFieldListItem('users', username, 'groupReqs', groupReqs[index]);
-                              await addFieldListItem('groups', groupName, 'members', username); // Add user to groups collection as well
+                              await addFieldListItem('groups', groupReqs[index], 'members', username); // Add user to groups collection as well
                               
                               // Handle accept friend request
                               scaffold.showSnackBar(
@@ -369,7 +369,7 @@ class _GroupsState extends State<Groups> {
         );
       },
     ).then((_) {
-        // After dialog is closed, trigger a rebuild of the friends list
+        // After dialog is closed, trigger a rebuild of the groups list
         setState(() {});
       });
   }
