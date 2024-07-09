@@ -52,7 +52,9 @@ class _LoginPageState extends State<LoginPage> {
       await _firestore.collection('users').doc(_controllerUsername.text).set({
         'email': _controllerEmail.text,
         'friends': [],
-        'friendReqs': []
+        'friendReqs': [],
+        'groups': [],
+        'groupReqs': [],
       });
       // Navigate to HomePage or any other page
     } on FirebaseAuthException catch (e) {

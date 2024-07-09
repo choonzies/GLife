@@ -134,55 +134,69 @@ class _FriendsState extends State<Friends> {
     }
   }
 
-void showAddFriendDialog(BuildContext context) {
-  TextEditingController textFieldController = TextEditingController();
+  void showAddFriendDialog(BuildContext context) {
+    TextEditingController textFieldController = TextEditingController();
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Add Friend'),
-        content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[
-              TextField(
-                controller: textFieldController,
-                decoration: const InputDecoration(
-                  hintText: 'Friend username',
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add Friend'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextField(
+                  controller: textFieldController,
+                  decoration: const InputDecoration(
+                    hintText: 'Friend username',
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Add'),
-            onPressed: () async {
-              // Retrieve friend's username from TextField
-              String friendUsername = textFieldController.text.trim();
-              
-              if (friendUsername.isNotEmpty) {
-                // Check if the user document exists in Firestore
-                DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(friendUsername).get();
-                bool userExists =  userDoc.exists;
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Add'),
+              onPressed: () async {
+                // Retrieve friend's username from TextField
+                String friendUsername = textFieldController.text.trim();
                 
-                if (userExists) {
-                  // Send friend request to the friend
-                  await addFieldListItem('users', friendUsername, 'friendReqs', username);
-                  Navigator.of(context).pop(); // Close the dialog
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      Future.delayed(const Duration(seconds: 1), () {
-                        Navigator.of(context).pop(true);
-                      });
-                      return const AlertDialog(
-                        title: Text('Friend request sent!'),
-                      );
-                    },
-                  );
+                if (friendUsername.isNotEmpty) {
+                  // Check if the user document exists in Firestore
+                  DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(friendUsername).get();
+                  bool userExists =  userDoc.exists;
+                  
+                  if (userExists) {
+                    // Send friend request to the friend
+                    await addFieldListItem('users', friendUsername, 'friendReqs', username);
+                    Navigator.of(context).pop(); // Close the dialog
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        Future.delayed(const Duration(seconds: 1), () {
+                          Navigator.of(context).pop(true);
+                        });
+                        return const AlertDialog(
+                          title: Text('Friend request sent!'),
+                        );
+                      },
+                    );
+                  } else {
+                    // Show error dialog for invalid username
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        Future.delayed(const Duration(seconds: 1), () {
+                          Navigator.of(context).pop(true);
+                        });
+                        return const AlertDialog(
+                          title: Text('Username not found!'),
+                        );
+                      },
+                    );
+                  }
                 } else {
-                  // Show error dialog for invalid username
+                  // Username is empty, show error dialog
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -190,38 +204,24 @@ void showAddFriendDialog(BuildContext context) {
                         Navigator.of(context).pop(true);
                       });
                       return const AlertDialog(
-                        title: Text('Username not found!'),
+                        title: Text('Invalid username!'),
                       );
                     },
                   );
                 }
-              } else {
-                // Username is empty, show error dialog
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    Future.delayed(const Duration(seconds: 1), () {
-                      Navigator.of(context).pop(true);
-                    });
-                    return const AlertDialog(
-                      title: Text('Invalid username!'),
-                    );
-                  },
-                );
-              }
-            },
-          ),
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
+              },
+            ),
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _showFriendRequestsDialog() {
     final scaffold = ScaffoldMessenger.of(context);
