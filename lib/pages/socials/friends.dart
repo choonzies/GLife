@@ -327,7 +327,7 @@ class _FriendsState extends State<Friends> {
               );
             },
             child: Container(
-              margin: EdgeInsets.only(bottom: 16),
+              margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Color(0xFFF1F4F8),
