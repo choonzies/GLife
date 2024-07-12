@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:glife/pages/socials/user_details.dart';
 
 class Friends extends StatefulWidget {
   Friends({super.key});
@@ -314,10 +315,17 @@ class _FriendsState extends State<Friends> {
   Widget _buildFriendsList() {
     return Expanded(
       child: ListView.builder(
+        shrinkWrap: true,
         itemCount: filteredFriends.length,
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(filteredFriends[index]),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UserDetails(filteredFriends[index]))
+              );
+            },
           );
         },
       ),

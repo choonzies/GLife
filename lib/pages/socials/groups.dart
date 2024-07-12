@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:glife/pages/socials/group_details.dart';
 
 class Groups extends StatefulWidget {
   Groups({super.key});
@@ -278,7 +279,7 @@ class _GroupsState extends State<Groups> {
     await _firestore.collection('groups').doc(groupName).set({  // Create group
         'leader': username,
         'admin': [],
-        'members': [],
+        'members': [username],
       });
     await addFieldListItem('users', username, 'groups', groupName); // Add group to leader's list
     setState(() {
@@ -381,6 +382,12 @@ class _GroupsState extends State<Groups> {
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(groups[index]),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => GroupDetails(groups[index], username)),
+              );
+            },
           );
         },
       ),
