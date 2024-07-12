@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:glife/pages/socials/user_details.dart';
 
 class GroupDetails extends StatefulWidget {
   final String groupName;
@@ -41,8 +42,6 @@ class _GroupDetailsState extends State<GroupDetails> {
       print('Error retrieving document: $e');
     }
   }
-
-  
 
   String getPhoto() {
     return 'assets/images/emptyprofile.jpeg';
@@ -161,22 +160,30 @@ class _GroupDetailsState extends State<GroupDetails> {
                           shrinkWrap: true,
                           itemCount: members.length,
                           itemBuilder: (context, index) {
-                            String achievement = members[index];
-                            return Container(
-                              margin: EdgeInsets.only(bottom: 16),
-                              padding: EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Color(0xFFF1F4F8),
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                              child: Text(
-                                achievement,
-                                style: TextStyle(
-                                  color: Color(0xFF101213),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
+                            String member = members[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => UserDetails(member))
+                                );
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(bottom: 16),
+                                padding: EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF1F4F8),
+                                  borderRadius: BorderRadius.circular(24),
                                 ),
-                              ),
+                                child: Text(
+                                  member,
+                                  style: TextStyle(
+                                    color: Color(0xFF101213),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              )
                             );
                           },
                         ),
