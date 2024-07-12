@@ -318,14 +318,30 @@ class _FriendsState extends State<Friends> {
         shrinkWrap: true,
         itemCount: filteredFriends.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(filteredFriends[index]),
-            onTap: () {
+          String friend = filteredFriends[index];
+          return GestureDetector(
+            onTap:  () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => UserDetails(filteredFriends[index]))
+                MaterialPageRoute(builder: (context) => UserDetails(friend))
               );
             },
+            child: Container(
+              margin: EdgeInsets.only(bottom: 16),
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Color(0xFFF1F4F8),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Text(
+                friend,
+                style: TextStyle(
+                  color: Color(0xFF101213),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              )
+            )
           );
         },
       ),

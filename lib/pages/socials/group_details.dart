@@ -83,16 +83,7 @@ class _GroupDetailsState extends State<GroupDetails> {
             children: [
               Container(
                 width: 200,
-                height: 200,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF4B39EF), Color(0xFFEE8B60)],
-                    stops: [0, 1],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                  ),
-                  shape: BoxShape.circle,
-                ),
+                height: 200, 
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(50),
                   child: Image.asset(getPhoto()),
