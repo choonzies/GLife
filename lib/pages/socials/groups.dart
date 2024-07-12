@@ -277,7 +277,7 @@ class _GroupsState extends State<Groups> {
       await addFieldListItem('users', friend, 'groupReqs', groupName);  // Send group reqs to members      
     }
     await _firestore.collection('groups').doc(groupName).set({  // Create group
-        'leader': username,
+        'leader': username, // Can be useful in the future
         'admin': [],
         'members': [username],
       });

@@ -67,6 +67,65 @@ class _GroupDetailsState extends State<GroupDetails> {
     return 67;
   }
 
+  void _confirmLeaveGroup(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Are you sure you want to leave',
+            style: TextStyle(
+              fontSize: 20,
+            )
+          ),
+          content: Text(
+            '$groupName?',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            )
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Leave'),
+              onPressed: () {
+                _leaveGroup(groupName); // Perform group creation logic
+                Navigator.of(context).popUntil((route) => route.isFirst); // Pop all dialogs and return to the first screen
+              },
+            ),
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    ).then((_) {
+        // After dialog is closed, trigger a rebuild of the groups list
+        setState(() {});
+      });
+  }
+
+  void _leaveGroup(String groupName) async {
+    // Remove user from groups collection
+    DocumentSnapshot groupDoc = await _firestore.collection('groups').doc(groupName).get();
+    List<dynamic> currentMembers = groupDoc.get('members');
+    currentMembers.remove(username);
+    await _firestore.collection('groups').doc(groupName).update({
+      'members': currentMembers,
+    });
+
+    // Remove group from users collection
+    DocumentSnapshot userDoc = await _firestore.collection('users').doc(username).get();
+    List<dynamic> currentGroups = userDoc.get('groups');
+    currentGroups.remove(groupName);
+    await _firestore.collection('users').doc(username).update({
+      'groups': currentGroups,
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -187,6 +246,13 @@ class _GroupDetailsState extends State<GroupDetails> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.exit_to_app),
+        backgroundColor: Color.fromARGB(255, 204, 81, 72),
+        onPressed: () {
+          _confirmLeaveGroup(context);
+        },
       ),
     );
   }
