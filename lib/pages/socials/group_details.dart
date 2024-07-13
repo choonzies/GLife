@@ -5,18 +5,20 @@ import 'package:glife/pages/socials/user_details.dart';
 class GroupDetails extends StatefulWidget {
   final String groupName;
   final String username;
+  final VoidCallback onLeave;
 
-  const GroupDetails(this.groupName, this.username, {super.key});
+  const GroupDetails(this.groupName, this.username, this.onLeave, {super.key});
 
   @override
-  State<GroupDetails> createState() => _GroupDetailsState(groupName, username);
+  State<GroupDetails> createState() => _GroupDetailsState(groupName, username, onLeave);
 }
 
 class _GroupDetailsState extends State<GroupDetails> {
   String groupName;
   String username;
+  VoidCallback onLeave;
 
-  _GroupDetailsState(this.groupName, this.username);
+  _GroupDetailsState(this.groupName, this.username, this.onLeave);
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   
@@ -89,6 +91,7 @@ class _GroupDetailsState extends State<GroupDetails> {
             TextButton(
               child: const Text('Leave'),
               onPressed: () {
+                onLeave();
                 _leaveGroup(groupName); // Perform group creation logic
                 Navigator.of(context).popUntil((route) => route.isFirst); // Pop all dialogs and return to the first screen
               },

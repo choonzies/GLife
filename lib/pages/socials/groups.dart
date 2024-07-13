@@ -385,7 +385,14 @@ class _GroupsState extends State<Groups> {
             onTap:  () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => GroupDetails(group, username))
+                MaterialPageRoute(builder: (context) => GroupDetails(
+                  group,
+                  username,
+                  () {
+                    setState(() {
+                      groups.remove(group);
+                    });
+                  }))
               );
             },
             child: Container(
