@@ -196,6 +196,7 @@ class _GroupDetailsState extends State<GroupDetails> {
                     ),
                   ),
                   child: SingleChildScrollView(
+                    physics: ScrollPhysics(),
                     padding: EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,6 +211,7 @@ class _GroupDetailsState extends State<GroupDetails> {
                         ),
                         SizedBox(height: 16),
                         ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: members.length,
                           itemBuilder: (context, index) {
