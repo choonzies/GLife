@@ -32,7 +32,7 @@ class _FriendsState extends State<Friends> {
 
   Future<String?> getUsernameFromEmail(String email) async {
     try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+      QuerySnapshot querySnapshot = await _firestore
           .collection('users')
           .where('email', isEqualTo: email)
           .get();
