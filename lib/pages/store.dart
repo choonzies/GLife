@@ -3,8 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class StorePage extends StatefulWidget {
   final Function() onItemsPurchased;
+  final Function() onCoinsChanged;
 
-  StorePage({required this.onItemsPurchased});
+  StorePage({required this.onItemsPurchased, required this.onCoinsChanged});
 
   @override
   _StorePageState createState() => _StorePageState();
@@ -20,24 +21,19 @@ class _StorePageState extends State<StorePage> {
   Map<String, List<Map<String, dynamic>>> _accessoryOptions = {
     'Helmets': [
       {'name': 'THE OG HELMET', 'image': 'assets/images/helmet.jpg'},
-      
     ],
     'Chestplates': [
       {'name': 'THE OG CHESTPLATE', 'image': 'assets/images/testchest.jpg'},
-      
     ],
-    'Leggings': [
-      
-    ],
-    'Boots': [
-      
-    ],
+    'Leggings': [],
+    'Boots': [],
   };
 
   Map<String, int> _itemPrices = {
-    'THE OG HELMET': 0,
+    'THE OG HELMET': 10,
     'Helmet 2': 30,
     'Helmet 3': 25,
+    'THE OG CHESTPLATE': 50,
     'Chestplate 1': 35,
     'Chestplate 2': 40,
     'Leggings 1': 25,
@@ -87,7 +83,9 @@ class _StorePageState extends State<StorePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Store', style: TextStyle(fontFamily: 'Raleway', fontWeight: FontWeight.bold)),
+        title: Text('Store',
+            style:
+                TextStyle(fontFamily: 'Raleway', fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         flexibleSpace: Container(
@@ -113,7 +111,10 @@ class _StorePageState extends State<StorePage> {
             SizedBox(height: 16),
             Text(
               'Coins: $coins',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, fontFamily: 'Raleway'),
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Raleway'),
             ),
             SizedBox(height: 16),
             Expanded(
@@ -137,9 +138,13 @@ class _StorePageState extends State<StorePage> {
         return ExpansionTile(
           title: Text(
             category,
-            style: TextStyle(fontFamily: 'Raleway', fontWeight: FontWeight.bold, fontSize: 18),
+            style: TextStyle(
+                fontFamily: 'Raleway',
+                fontWeight: FontWeight.bold,
+                fontSize: 18),
           ),
-          children: _accessoryOptions[category]!.map((Map<String, dynamic> accessory) {
+          children: _accessoryOptions[category]!
+              .map((Map<String, dynamic> accessory) {
             String name = accessory['name'];
             String image = accessory['image'];
             int price = _itemPrices[name] ?? 0;
@@ -156,24 +161,46 @@ class _StorePageState extends State<StorePage> {
               ),
               subtitle: Text(
                 alreadyOwned ? 'Owned' : 'Price: $price coins',
-                style: TextStyle(fontFamily: 'Raleway', color: alreadyOwned ? Colors.green : Colors.black),
+                style: TextStyle(
+                    fontFamily: 'Raleway',
+                    color: alreadyOwned ? Colors.green : Colors.black),
               ),
               trailing: !alreadyOwned
                   ? TextButton(
-                      onPressed: coins >= price
-                          ? () {
-                              setState(() {
-                                _addOwnedItem(category, name);
-                                coins -= price;
-                                _saveOwnedItems();
-                                _saveCoins(coins);
-                                widget.onItemsPurchased();
-                              });
-                            }
-                          : null,
+                      onPressed: () {
+                        if (coins >= price) {
+                          setState(() {
+                            _addOwnedItem(category, name);
+                            coins -= price;
+                            _saveOwnedItems();
+                            _saveCoins(coins);
+                            widget.onItemsPurchased();
+                            widget.onCoinsChanged();
+                          });
+                        } else {
+                          // Show dialog when coins are insufficient
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Insufficient Coins!"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text("OK"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        }
+                      },
                       child: Text(
                         'Buy for $price coins',
-                        style: TextStyle(color: Colors.green, fontFamily: 'Raleway'),
+                        style: TextStyle(
+                            color: Colors.green, fontFamily: 'Raleway'),
                       ),
                     )
                   : null,

@@ -1,9 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
-
-
 
 class AchievementsPage extends StatefulWidget {
   @override
@@ -33,15 +30,31 @@ class _AchievementsPageState extends State<AchievementsPage> {
       highestStreak = prefs.getInt('highestStreak') ?? 0;
       totalCalories = prefs.getInt('totalCalories') ?? 0;
       coins = prefs.getInt('coins') ?? 0;
-      hasChestplate = (prefs.getStringList('ownedChestplates') ?? []).isNotEmpty;
+      hasChestplate =
+          (prefs.getStringList('ownedChestplates') ?? []).isNotEmpty;
       baseImageChanged = (prefs.getString('baseImageUrl') ?? '').isNotEmpty;
-      
     });
+  }
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  
+  Future<void> addFieldListItem(
+      String collection, String document, String field, String item) async {
+    try {
+      print(123);
+      await _firestore.collection(collection).doc(document).update({
+        field: FieldValue.arrayUnion([item]),
+      });
+      print('Item added to ListField successfully');
+    } catch (e) {
+      print('Error adding item: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    
+    addFieldListItem('users', 'whatthe', 'awuw', 'faq111qq');
+    print('huh');
     return Scaffold(
       appBar: AppBar(
         title: Text('Achievements'),
@@ -75,7 +88,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
               unlocked: totalCalories >= 10000,
             ),
             SizedBox(height: 16),
-            
+
             SizedBox(height: 16),
             AchievementCard(
               title: 'Persistent Achiever',
@@ -95,7 +108,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
               unlocked: hasChestplate,
             ),
             SizedBox(height: 16),
-            
+
             // Add more AchievementCard widgets as needed
           ],
         ),
