@@ -1,16 +1,18 @@
-# glife
+# GLife
 
-A new Flutter project.
+![6136](https://github.com/user-attachments/assets/7095aec6-09fe-46ae-8063-2ed50e0cf148)
+
+GLife is a mobile app designed to track your health and wellness while motivating you through gamified features. 
 
 ## Getting Started
+Check out the releases tab to download the latest .apk file!
 
-This project is a starting point for a Flutter application.
+## Key Features
+- Gamified character with collectibles
+- Currency system to purchase character accessories
+- Streak system
+- Full authentication and account based application
+- Connect with friends and groups through social elements
+- Achievements system
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Download GLife now and start your health journey with a fun twist!
